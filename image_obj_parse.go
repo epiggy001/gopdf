@@ -394,29 +394,27 @@ func compress(data []byte) ([]byte, error) {
 	return buff.Bytes(), nil
 }
 
-func readUInt(f *bytes.Reader) (uint, error) {
+func readUInt(f *bytes.Reader) (uint32, error) {
 	buff, err := readBytes(f, 4)
 	//fmt.Printf("%#v\n\n", buff)
 	if err != nil {
 		return 0, err
 	}
 	n := binary.BigEndian.Uint32(buff)
-	return uint(n), nil
+	return n, nil
 }
 
 func readInt(f *bytes.Reader) (int, error) {
-
 	u, err := readUInt(f)
 	if err != nil {
 		return 0, err
 	}
-	var v int
-	if u >= 0x8000 {
-		v = int(u) - 65536
-	} else {
-		v = int(u)
-	}
-	return v, nil
+
+	var mask uint32 = 1 << 31
+	// In go ^x is the same with  ~x in other language
+	mask = ^mask
+	u &= mask
+	return int(u), nil
 }
 
 func readBytes(f *bytes.Reader, len int) ([]byte, error) {
