@@ -410,10 +410,9 @@ func readInt(f *bytes.Reader) (int, error) {
 		return 0, err
 	}
 
-	var mask uint32 = 1 << 31
-	// In go ^x is the same with  ~x in other language
-	mask = ^mask
-	u &= mask
+	// Remove the most significant bit to make sure the return value is always
+	// larger than zero.
+	u &^= (1 << 31)
 	return int(u), nil
 }
 
